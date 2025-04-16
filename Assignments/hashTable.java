@@ -1,0 +1,79 @@
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.zip.CRC32;
+
+public class hashTable {
+    private int defaultTableSize = 667;
+    final private int tableSize;
+    private List<pair<String,String>>[] table;
+    public hashTable() {
+        this.table = new ArrayList[defaultTableSize];
+        this.tableSize = defaultTableSize;
+    }
+    public hashTable(int tableSize) {
+        this.table = new ArrayList[tableSize];
+        this.tableSize = tableSize;
+    }
+    public int hash(String key) {
+        int hashValue = key.hashCode();
+        hashValue %= this.tableSize;
+        if (hashValue < 0) {
+            hashValue += this.tableSize;
+        }
+        return hashValue;
+    }
+    public int hash2(String key) {
+        CRC32 crc = new CRC32();
+        crc.update(key.getBytes());
+        int hashValue = (int) crc.getValue();
+        hashValue %= this.tableSize;
+        if (hashValue < 0) {
+            hashValue += this.tableSize;
+        }
+        return hashValue;
+    }
+    public void insert(String key, String value) {
+        int hashedKey = this.hash(key);
+        if (this.table[hashedKey] == null) {
+            ArrayList<pair<String,String>> chain = new ArrayList<>();
+            chain.add(new pair<String,String>(key, value));
+            this.table[hashedKey] = chain;
+        }
+        else {
+            this.table[hashedKey].add(new pair<String,String>(key, value));
+        }
+    }
+    public String get(String key) {
+        int hashedKey = this.hash(key);
+        if (this.table[hashedKey] == null) {
+            return null;
+        }
+        else {
+            for (pair<String,String> kv : this.table[hashedKey]) {
+                if (key.equals((String) kv.key)) {
+                    return (String) kv.value;
+                }
+            }
+        }
+        return null;
+    }
+    public void remove(String key) {
+        int hashedKey = this.hash(key);
+        if (this.table[hashedKey] != null) {
+            Iterator<pair<String,String>> it = this.table[hashedKey].iterator();
+            while (it.hasNext()) {
+                pair<String,String> kv = it.next();
+                if (key.equals((String) kv.key)) {
+                    it.remove();
+                }
+            }
+        }
+    }
+    public int collisions(String key) {
+        int hashedKey = this.hash(key);
+        List<pair<String,String>> bucket = this.table[hashedKey];
+        // No. of collisions are the size of the bucket minus 1 (the key itself)
+        return bucket.size() > 1 ? bucket.size() - 1 : 0;
+    }
+}

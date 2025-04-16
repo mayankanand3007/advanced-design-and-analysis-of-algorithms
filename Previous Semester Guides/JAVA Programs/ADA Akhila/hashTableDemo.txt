@@ -1,0 +1,25 @@
+package hashtabledemo;
+
+import java.io.IOException;
+import java.util.List;
+
+public class hashTableDemo {
+
+    public static void main(String[] args) throws IOException {
+        csvReader airports = new csvReader();
+        List<pair<String,String>> codes = airports.read("./airportCodes.csv");
+        System.out.printf("read %d airport locations%n", codes.size());
+        hashTable ht = new hashTable(275);
+        codes.forEach(airport -> ht.insert(airport.key, airport.value));
+        int[] f = ht.bucketFillStatus();
+        for (int i = 2; i < f.length; i++) {
+            System.out.printf("%d hash entries with %d collisions%n", f[i], i);
+        }
+        String[] testKeys = {"CAB", "OUA", "CRF", "LIQ"};
+        for(String key: testKeys ){
+            System.out.printf("Size of array with key "+ key +" is %d%n", ht.collisions(key));
+        }
+
+
+    }
+}

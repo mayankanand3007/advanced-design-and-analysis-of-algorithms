@@ -1,0 +1,4 @@
+Successor in BST for node N
+if N has a right child successor in right subtree
+else if N has ancestor for which N is in the left tree, first such ancestor
+else N is maximum and has no successor.
